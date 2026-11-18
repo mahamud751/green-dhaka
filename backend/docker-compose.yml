@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: green_dhaka
+      POSTGRES_USER: green_dhaka
+      POSTGRES_PASSWORD: green_dhaka
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U green_dhaka"]
+      interval: 5s
+      retries: 10
+volumes:
+  pgdata:

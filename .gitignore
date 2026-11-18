@@ -1,0 +1,15 @@
+.DS_Store
+**/node_modules/
+**/.env
+**/dist/
+backend/.local-postgres/
+backend/uploads/
+backend/*.log
+app/android/.gradle/
+app/android/.cxx/
+app/android/app/.cxx/
+app/android/app/build/
+app/android/build/
+app/android/local.properties
+app/ios/Pods/
+app/ios/build/

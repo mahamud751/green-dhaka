@@ -1,0 +1,266 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+enum Role {
+  SELLER
+  PARTNER
+  ADMIN
+}
+enum OrderStatus {
+  created
+  searching_partner
+  no_partner_found
+  partner_assigned
+  on_the_way
+  arrived
+  weighing
+  disputed
+  completed
+  cancelled
+}
+model User {
+  id String @id @default(uuid())
+  phone String @unique
+  name String @default("")
+  language String @default("en")
+  role Role @default(SELLER)
+  active Boolean @default(true)
+  referralCode String @unique
+  referredBy String?
+  deviceHash String?
+  createdAt DateTime @default(now())
+  addresses Address[]
+  orders Order[]
+  partner Partner?
+  credits CreditTxn[]
+  notifications Notification[]
+}
+model OtpChallenge {
+  phone String @id
+  hash String
+  expiresAt DateTime
+  sentAt DateTime @default(now())
+  attempts Int @default(0)
+  lockedUntil DateTime?
+}
+model Area {
+  id String @id
+  name String
+  nameBn String
+  lat Float
+  lng Float
+  radiusKm Float @default(3)
+  active Boolean @default(true)
+  addresses Address[]
+  rates Rate[]
+}
+model Address {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields:[userId],references:[id])
+  areaId String
+  area Area @relation(fields:[areaId],references:[id])
+  label String @default("Home")
+  line1 String
+  landmark String @default("")
+  lat Float
+  lng Float
+  active Boolean @default(true)
+  orders Order[]
+}
+model Category {
+  id String @id
+  name String
+  nameBn String
+  icon String
+  color String
+  commissionPercent Float?
+  active Boolean @default(true)
+  items Item[]
+}
+model Item {
+  id String @id
+  categoryId String
+  category Category @relation(fields:[categoryId],references:[id])
+  name String
+  nameBn String
+  unit String @default("kg")
+  active Boolean @default(true)
+  rates Rate[]
+  orderItems OrderItem[]
+}
+model Rate {
+  id String @id @default(uuid())
+  itemId String
+  item Item @relation(fields:[itemId],references:[id])
+  areaId String
+  area Area @relation(fields:[areaId],references:[id])
+  price Int
+  updatedBy String
+  effectiveFrom DateTime @default(now())
+  @@index([areaId,itemId,effectiveFrom])
+}
+model Partner {
+  id String @id @default(uuid())
+  userId String @unique
+  user User @relation(fields:[userId],references:[id])
+  nidRef String
+  photoUrl String @default("")
+  vehicle String
+  scaleDetails String
+  kycStatus String @default("pending")
+  online Boolean @default(false)
+  areaId String
+  lat Float
+  lng Float
+  rating Float @default(0)
+  orders Order[]
+  offers DispatchOffer[]
+}
+model Order {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields:[userId],references:[id])
+  addressId String
+  address Address @relation(fields:[addressId],references:[id])
+  partnerId String?
+  partner Partner? @relation(fields:[partnerId],references:[id])
+  type String
+  slotStart DateTime?
+  slotEnd DateTime?
+  status OrderStatus @default(created)
+  estimatedValue Int
+  finalValue Int?
+  fee Int @default(40)
+  creditUsed Int @default(0)
+  otpHash String
+  otpEncrypted String
+  otpAttempts Int @default(0)
+  weightsApproved Boolean @default(false)
+  weighingVersion Int @default(0)
+  otpUsed Boolean @default(false)
+  cashPaid Boolean @default(false)
+  cancellationReason String?
+  cancellationFee Int @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  items OrderItem[]
+  photos OrderPhoto[]
+  offers DispatchOffer[]
+  ratings Rating[]
+  @@index([status,createdAt])
+}
+model OrderItem {
+  id String @id @default(uuid())
+  orderId String
+  order Order @relation(fields:[orderId],references:[id])
+  itemId String
+  item Item @relation(fields:[itemId],references:[id])
+  estimatedQty Decimal @db.Decimal(10,3)
+  finalQty Decimal? @db.Decimal(10,3)
+  lockedRate Int
+  notes String @default("")
+}
+model OrderPhoto {
+  id String @id @default(uuid())
+  orderId String
+  order Order @relation(fields:[orderId],references:[id])
+  url String
+  uploadedBy String
+  createdAt DateTime @default(now())
+}
+model DispatchOffer {
+  id String @id @default(uuid())
+  orderId String
+  order Order @relation(fields:[orderId],references:[id])
+  partnerId String
+  partner Partner @relation(fields:[partnerId],references:[id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  accepted Boolean @default(false)
+  @@unique([orderId,partnerId])
+}
+model CreditTxn {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields:[userId],references:[id])
+  amount Int
+  type String
+  reason String
+  orderId String?
+  createdAt DateTime @default(now())
+  @@unique([userId,type,orderId])
+}
+model Referral {
+  id String @id @default(uuid())
+  referrerId String
+  refereeId String @unique
+  status String @default("pending")
+  createdAt DateTime @default(now())
+}
+model Rating {
+  id String @id @default(uuid())
+  orderId String
+  order Order @relation(fields:[orderId],references:[id])
+  fromId String
+  toId String
+  stars Int
+  comment String @default("")
+  @@unique([orderId,fromId])
+}
+model AuditLog {
+  id String @id @default(uuid())
+  actor String
+  action String
+  entity String
+  before Json?
+  after Json?
+  createdAt DateTime @default(now())
+}
+model Config {
+  id String @id @default("main")
+  pickupFee Int @default(40)
+  freeThreshold Int @default(200)
+  minimumOrder Int @default(100)
+  referralAmount Int @default(50)
+  radiusKm Float @default(3)
+  expandedRadiusKm Float @default(5)
+  commissionPercent Float @default(0)
+  slotStartHour Int @default(8)
+  slotEndHour Int @default(20)
+  slotDaysAhead Int @default(7)
+  supportPhone String @default("")
+  supportWhatsapp String @default("")
+  ratesAreDemo Boolean @default(true)
+}
+model Notification {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields:[userId],references:[id])
+  title String
+  body String
+  orderId String?
+  delivered Boolean @default(false)
+  attempts Int @default(0)
+  createdAt DateTime @default(now())
+}
+model Waitlist {
+  id String @id @default(uuid())
+  phone String
+  area String
+  createdAt DateTime @default(now())
+  @@unique([phone,area])
+}
+model AnalyticsEvent {
+  id String @id @default(uuid())
+  userId String
+  name String
+  orderId String?
+  area String?
+  appVersion String
+  createdAt DateTime @default(now())
+}

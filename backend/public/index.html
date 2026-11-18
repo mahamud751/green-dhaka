@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Green Dhaka · Operations</title>
+    <link rel="stylesheet" href="admin.css" />
+    <script src="admin.js" defer></script>
+  </head>
+  <body>
+    <div id="login" class="login">
+      <div class="login-story">
+        <a class="wordmark">◒ green dhaka<span>.</span></a>
+        <div>
+          <span class="eyebrow">SMALL STEPS. BIG POSSIBILITIES.</span>
+          <h1>A cleaner city.<br />A clearer picture.</h1>
+          <p>
+            Your workspace for fair prices, reliable pickups,<br />and a little
+            more green in every neighbourhood.
+          </p>
+          <div class="rings"><span>↗</span></div>
+        </div>
+        <small>MADE FOR OUR CITY · DHAKA, BANGLADESH</small>
+      </div>
+      <div class="login-form">
+        <span class="eyebrow">OPERATIONS WORKSPACE</span>
+        <h2>Welcome back.</h2>
+        <p>Sign in with your administrator phone number.</p>
+        <form id="login-form">
+          <label
+            >Bangladesh mobile number<input
+              id="phone"
+              autocomplete="tel"
+              placeholder="+8801700000000"
+              value="+8801700000000"
+              required
+              pattern="\+8801[3-9][0-9]{8}"
+          /></label>
+          <div id="code-block" hidden>
+            <label
+              >6-digit verification code<input
+                id="code"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                placeholder="••••••"
+                pattern="[0-9]{6}"
+                maxlength="6" /></label
+            ><small id="dev-hint"></small>
+          </div>
+          <button id="login-button" class="primary">
+            Send verification code ↗
+          </button>
+        </form>
+        <div id="login-error" role="alert"></div>
+        <p class="quiet">
+          Admin access is assigned in the database.<br />Other roles use the
+          mobile app.
+        </p>
+        <a href="/docs" target="_blank" rel="noopener"
+          >Explore API documentation ↗</a
+        >
+      </div>
+    </div>
+    <div id="workspace" hidden>
+      <aside>
+        <a class="wordmark">◒ green dhaka<span>.</span></a
+        ><small class="eyebrow">OPERATIONS</small>
+        <nav id="nav">
+          <button data-page="overview" class="active">
+            ◫ <span>Overview</span></button
+          ><button data-page="orders">▤ <span>Pickup orders</span></button
+          ><button data-page="partners">
+            ♧ <span>Recycling partners</span></button
+          ><button data-page="rates">↗ <span>Material rates</span></button
+          ><button data-page="catalogue">▧ <span>Catalogue</span></button
+          ><button data-page="credits">▣ <span>Pickup credits</span></button
+          ><button data-page="waitlist">
+            ⌖ <span>Neighbourhood waitlist</span></button
+          ><button data-page="settings">⚙ <span>Business settings</span></button
+          ><button data-page="audit">◷ <span>Activity log</span></button>
+        </nav>
+        <div class="aside-bottom">
+          <div class="city-note">
+            <span>One pickup at a time.</span>
+            <p>A greener Dhaka starts with good operations.</p>
+          </div>
+          <a href="/docs" target="_blank" rel="noopener">API documentation ↗</a
+          ><button id="logout">Sign out ↗</button>
+        </div>
+      </aside>
+      <main>
+        <header>
+          <div>
+            <span class="eyebrow">YOUR CITY. YOUR WORKSPACE.</span>
+            <h2 id="page-title">Overview</h2>
+          </div>
+          <div class="header-right">
+            <span id="clock"></span
+            ><button id="refresh" class="secondary">↻ Refresh</button>
+            <div class="avatar">GD</div>
+          </div>
+        </header>
+        <div id="banner" hidden></div>
+        <div id="error" role="alert" hidden></div>
+        <div id="content"></div>
+        <footer>
+          GREEN DHAKA
+          <span>Fair rates. Real people. A little greener, every day.</span>
+        </footer>
+      </main>
+    </div>
+    <div id="toast" role="status" hidden></div>
+    <dialog id="detail-dialog">
+      <div id="dialog-content"></div>
+      <button class="secondary" id="close-dialog">Close</button>
+    </dialog>
+  </body>
+</html>
