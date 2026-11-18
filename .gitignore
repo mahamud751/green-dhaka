@@ -13,3 +13,8 @@ app/android/build/
 app/android/local.properties
 app/ios/Pods/
 app/ios/build/
+app/android/keystore.properties
+app/android/app/*.keystore
+!app/android/app/debug.keystore
+*.jks
+.git-backups/

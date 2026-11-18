@@ -132,6 +132,22 @@ This is a working local implementation, not an already commissioned production s
 - **Production rollout:** configure TLS, SMS credentials, notification delivery, real support contacts, production rate survey, database/object-storage encryption and backups, retention, monitoring and release signing. No uptime, APK-size, market-survey, identity-verification or legal-compliance guarantees are claimed.
 - Wallet cash-out, bKash/Nagad, recurring pickups, bulk B2B, vehicles/appliances and sponsored gifts remain outside the DOCX MVP.
 
+## Production release (Android)
+
+- **API:** release builds always use `https://greendhaka.crazysolve.com` (HTTPS only; plain HTTP is blocked in release). Debug builds use the local server and keep **You → Connection settings**, which is hidden in release.
+- **Sign-in in production** sends real SMS: the server needs `SMS_GATEWAY_URL` and `SMS_GATEWAY_TOKEN`, and must not set `DEV_OTP`.
+- **Signing key:** `app/android/app/green-dhaka-release.keystore` with passwords in `app/android/keystore.properties`. Both are git-ignored. **Back them up somewhere safe**: every future update must be signed with this same key. Release builds stop with an error if the key is missing; they never fall back to the debug key.
+- **Build:**
+
+```sh
+cd app/android
+./gradlew assembleRelease -PreactNativeArchitectures=armeabi-v7a,arm64-v8a,x86_64
+```
+
+Output in `app/android/app/build/outputs/apk/release/`: `app-arm64-v8a-release.apk` (most phones), `app-armeabi-v7a-release.apk` (older 32-bit phones), `app-x86_64-release.apk` (emulators) and `app-universal-release.apk` (runs on all). Release APKs bundle the JavaScript and don't need Metro. Bump `versionCode` and `versionName` in `app/android/app/build.gradle` and `APP_VERSION` in `app/src/api.ts` for each new release.
+
+- **Brand assets:** logo SVG and 512/1024 px store icons are in `app/docs/logo/`. Android uses vector adaptive icons and a branded launch screen.
+
 ## Verification
 
 ```sh
